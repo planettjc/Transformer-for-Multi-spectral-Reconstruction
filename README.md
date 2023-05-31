@@ -17,6 +17,7 @@ Modified from the [code](https://github.com/caiyuanhao1998/MST) in [Coarse-to-Fi
 ```shell
 pip install -r requirements.txt
 ```
+The installation could be finished within an hour on a common Linux server.
 
 ## 2. Prepare Dataset:
 Randomly crop the encoded measurement and the calibrated masks and ground truths of each spectral channel into small patches (e.g. 256 in width and in height) and then put them into the corresponding folders of `datasets/` and recollect them as the following form:
@@ -60,6 +61,8 @@ Randomly crop the encoded measurement and the calibrated masks and ground truths
 
 ### 3.1　Training
 
+The training data (including the measurement, mask and ground truth patches) should be put into the `meas`, `mask` and `gt` subfolders in `./datasets/real_data` folder respectively.
+
 ```shell
 cd THETA
 
@@ -73,12 +76,15 @@ python train_real.py --outf ./exp/cst_m_real/ --method cst_m
 python train_real.py --outf ./exp/cst_l_real/ --method cst_l
 ```
 
-The training log, trained model, and reconstrcuted multi-spectral data will be available in `THETA/exp/` as determined by the `outf` parameter. 
+The training log, trained model, and reconstrcuted multi-spectral data will be available in `./exp/` as determined by the `outf` parameter. 
 
+The training time depends on the hardware setup and the network parameters. On a single NVIDIA GeForce RTX 3090 GPU, with the number of samples per epoch being set as 5000, patch size as 512*512, batch size as 5 and the CST_S structure, the training time for one epoch is within 400 seconds.
 
 ### 3.2　Testing	
 
-The parameter `pretrained_model_path` should be set to be the path of the trained model, e.g., `./exp/cst_s_real/2022_08_16_21_39_19/model/model_epoch_459.pth`.
+The testing data (including the measurement, mask and ground truth (if exists) patches) should be put into the `meas_test`, `mask_test` and `gt_test` subfolders in `./datasets/real_data` folder respectively. For convenience, a small realistic dataset acquired by us has been provided.
+
+The parameter `pretrained_model_path` should be set to be the path of the trained model, e.g., `./exp/cst_s_real/2022_08_16_21_39_19/model/model_epoch_459.pth`. For convenience, a pre-trained model for `CST_S` has been provided in `./exp/cst_s_real/pre_trained_model.pth`.
 
 ```shell
 cd THETA
@@ -94,6 +100,17 @@ python test_real.py --outf ./exp/cst_l_real/ --method cst_l --pretrained_model_p
 
 ```
 
-- The reconstrcuted multi-spectral data will be output into the `test` subfolder in the folder determined by the `outf` parameter.  
+The reconstrcuted multi-spectral data will be output into the `test` subfolder in the folder determined by the `outf` parameter. For convenience, the result on the provided realistic dataset has been provided in `./exp/cst_s_real/test`.
+
+The testing time depends on the hardware setup and the network parameters. On a single NVIDIA GeForce RTX 3090 GPU, with the input patch size as 512*512 and the CST_S structure, the processing time for one patch is within 0.2 seconds.
+
+### 3.3　Visualization
+Generate the multi-spectral image series of the reconstruction (above row) and the ground truth (below row) in one figure by using the following MATLAB script.
+
+```shell
+Run visualization.m
+```	
+
+
 
 
